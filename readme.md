@@ -12,9 +12,12 @@ sudo sh mkl_install.sh
 For the test, please enter `./dlsystem_test`, add environment variables and make the library:
 ```bash
 export LD_LIBRARY_PATH=$LD_LIBRARY_LIB:/opt/intel/lib/intel64:/opt/intel/mkl/lib/intel64
+```
+
+```bash
 make
 ```
-Then run test by use the command:
+Then run test by using the command:
 ```bash
 python3 run_test.py TensorFreeze
 ```
