@@ -9,6 +9,8 @@ boost_conv2d_gw = boost_lib.conv2d_gw
 boost_max_pool = boost_lib.max_pool
 boost_max_pool_grad = boost_lib.max_pool_grad
 boost_matmul = boost_lib.matmul
+boost_relu = boost_lib.relu
+boost_relu_grad = boost_lib.relu_grad
 
 
 def fecth_pointer(array):
@@ -38,6 +40,33 @@ def matmul_boost(mat_left, mat_right, trans_left, trans_right):
     assert not boost_matmul(fecth_pointer(mat_left), fecth_pointer(mat_right), fecth_pointer(result_mat),
                         trans_left, trans_right, m, k, n)
     return result_mat
+
+
+def relu_boost(input_tensor):
+    shape = np.shape(input_tensor)
+    result = np.ndarray(shape = shape, dtype = np.float32)
+    input_pointer = fecth_pointer(input_tensor)
+    result_pointer = fecth_pointer(result)
+    assert not boost_relu(
+        input_pointer,
+        result_pointer,
+        input_tensor.size
+    )
+    return result
+
+
+def relu_grad_boost(relu_output):
+    shape = np.shape(relu_output)
+    result = np.ndarray(shape=shape, dtype=np.float32)
+    input_pointer = fecth_pointer(relu_output)
+    result_pointer = fecth_pointer(result)
+    assert not boost_relu_grad(
+        input_pointer,
+        result_pointer,
+        relu_output.size
+    )
+    return result
+
 
 def conv2d_boost(input_tensor, filter, strides, padding, width_padding_left = 0, width_padding_right = 0,
                  height_padding_up = 0, height_padding_down = 0):

@@ -28,24 +28,6 @@ inline int mat_find(const int &i, const int &j, const int &j_size)
     return i * j_size + j;
 }
 
-//inline void matmul(const int &m, const int &n, const int &k, const float &alpha, float *a,
-//                 const int &lda, float *b, const int &ldb, const float &beta, float *c, const int &ldc)
-//{
-//
-//    for (register int w = 0; w < k; w++)
-//    {
-//        for (register int i = 0; i < m; i++)
-//        {
-//            for (register int j = 0; j < n; j++)
-//            {
-//
-//                *(c + mat_find(i, j, n)) += *(a + mat_find(i, w, k)) * (*(b + mat_find(w, j, n))) * alpha
-//                                            + (*(c + mat_find(i, j, n))) * beta;
-//            }
-//        }
-//    }
-//}
-
 
 extern "C"
 int matmul(float *mat_left, float *mat_right, float *mat_result, bool trans_left, bool trans_right, int m, int k, int n)
@@ -68,13 +50,30 @@ int matmul(float *mat_left, float *mat_right, float *mat_result, bool trans_left
 }
 
 extern "C"
+int relu(float* input_tensor, float *result, int size)
+{
+    register int i = 0;
+    for (i = 0; i < size; i++)
+        *(result + i) = max(*(input_tensor + i), 0);
+    return 0;
+}
+
+extern "C"
+int relu_grad(float *relu_output, float *result, int size)
+{
+    register int i = 0;
+    for (i = 0; i < size; i++)
+        *(result + i) = *(relu_output + i) > 0;
+    return 0;
+}
+
+extern "C"
 int conv2d(float* input_tensor, float *output_tensor, float* filter,
            int batch_size, int input_height, int input_width, int input_channels,
            int stride_batch, int stride_in_height, int stride_in_width, int stride_in_channel,
            int filter_height, int filter_width, int output_channels)
 {
     
-    mkl_set_num_threads(8);
     register int b = 0; // batch number
     int f = 0; // filter number/output_channel number
     int c = 0; // input_channel number
@@ -116,7 +115,6 @@ int conv2d_gi(float* sensitivity_map, float* filter, float* result,
                     int filter_height, int filter_width, int input_channels)
 {
     
-    mkl_set_num_threads(8);
     int b = 0; // batch number
     int f = 0; // filter number/sensitivity_channel number
     int c = 0; // filter_input_channel/result_channel number
@@ -168,8 +166,7 @@ int conv2d_gw(float *input_tensor, float *sensitivity_map, float* result,
             int stride_batch, int stride_in_height, int stride_in_width, int stride_in_channel,
             int sensitivity_height, int sensitivity_width, int sensitivity_channels)
 {
-    
-    mkl_set_num_threads(8);
+
     int b = 0; // batch number
     int f = 0; // sensitivity_channel number
     int c = 0; // input_channel

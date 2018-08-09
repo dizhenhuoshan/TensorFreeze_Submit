@@ -140,7 +140,6 @@ class ConstantOp(Operator):
         assert len(node.inputs) == 0, "\033[1;31mConstantOp compute args_num is not 0\033[0m"
         node.value = node.const_value
 
-
     def gradient(self, node, this_grad):
         return constant(0) * this_grad
 
@@ -233,15 +232,7 @@ class MatMulOp(Operator):
         return new_node
 
     def compute(self, node):
-        # if node.left_mat_trans:
-        #     tmp_left_mat = node.inputs[0].value.T
-        # else:
-        #     tmp_left_mat = node.inputs[0].value
-        # if node.right_mat_trans:
-        #     tmp_right_mat = node.inputs[1].value.T
-        # else:
-        #     tmp_right_mat = node.inputs[1].value
-        # node.value = np.dot(tmp_left_mat, tmp_right_mat)
+
         node.value = c_boost.matmul_boost(node.inputs[0].value, node.inputs[1].value, node.left_mat_trans, node.right_mat_trans)
 
     def gradient(self, node, this_grad):
@@ -545,7 +536,7 @@ class ReluGradientOp(Operator):
         return new_node
 
     def compute(self, node):
-        node.value = (np.maximum(np.sign(node.inputs[0].value), 0)) * node.inputs[1].value
+        node.value = c_boost.relu_grad_boost(node.inputs[0].value) * node.inputs[1].value
 
     def gradient(self, node, this_grad):
         assert False, "\033[1;31mReluGradientOp shouldn't appear in gradient\033[0m"
